@@ -1,0 +1,13 @@
+_target_: models.internvl.InternVLModel
+model_id: OpenGVLab/InternVL2_5-8B
+model_name: InternVL2_5_8B
+model_nicename: "InternVL 2.5 8B"
+probe_layers:
+  mmp:
+  - mlp1
+  last_mlp:
+  - language_model
+  - model
+probe_train_indexes:
+  mmp: null
+  last_mlp: [41,299]

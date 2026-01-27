@@ -1,0 +1,13 @@
+# @package _global_
+defaults:
+ - _self_
+ - override /dataset: cs_bal_1t
+ - override /model: Gemma12B
+ - override /task: bin_class
+ - override /probe: attn
+
+task:
+  batch_size: 100 #activations to save in one file
+
+probe:
+  batch_size: 100 #batch size in SGD probe training

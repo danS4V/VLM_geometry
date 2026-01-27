@@ -1,0 +1,73 @@
+recreate_meta: false
+generate_images: true
+dataset:
+  DATASET_TYPE: colshape_unbalanced
+  DATAPATH: ./data/
+  DATASET_NAME: cs_bal_1t_test
+  REPEATS: 1
+  N_distractors:
+  - 2
+  - 4
+  - 8
+  - 16
+  - 24
+  - 32
+  - 40
+  P_interfere:
+  - 0
+  - 0.25
+  - 0.5
+  - 0.75
+  - 1.0
+  N_unique_distractors:
+  - 4
+  COLORS:
+  - red
+  - green
+  - blue
+  - yellow
+  - orange
+  - purple
+  COLORS_DICT:
+    red:
+    - 228
+    - 26
+    - 28
+    green:
+    - 77
+    - 175
+    - 74
+    blue:
+    - 55
+    - 126
+    - 184
+    yellow:
+    - 255
+    - 215
+    - 0
+    orange:
+    - 255
+    - 127
+    - 0
+    purple:
+    - 152
+    - 78
+    - 163
+  SHAPES:
+  - square
+  - triangle
+  - circle
+  - pentagon
+  - star
+  - heart
+  constants:
+    CANVAS_SIZE:
+    - 448
+    - 448
+    STENCIL_SIZE: 32
+  generate_metadata_function:
+    _target_: vlm_datasets.shapecol_unbal.generate_metadata
+    _partial_: true
+  make_image_function:
+    _target_: vlm_datasets.shapecol_unbal.make_image_from_metadata
+    _partial_: true
