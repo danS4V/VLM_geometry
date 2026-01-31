@@ -4,7 +4,7 @@ defaults:
  - override /dataset: cs_bal_1t
  - override /model: Gemma12B
  - override /task: bin_class
- - override /probe: attn
+ - override /probe: attn_single
 
 task:
   batch_size: 100 #activations to save in one file

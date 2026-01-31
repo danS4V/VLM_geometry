@@ -2,8 +2,8 @@ test: False # if true, runs only on the first two dataset points
 
 defaults:
   - _self_
-  - dataset: conj1
-  - model: Gemma4B
+  - dataset: cs_bal_1t
+  - model: Qwen7B
   - task: bin_class
   - probe: null
   - override hydra/hydra_logging: disabled  
