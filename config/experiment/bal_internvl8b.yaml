@@ -4,5 +4,5 @@ defaults:
  - override /dataset: cs_bal_1t
  - override /model: InternVL8B
  - override /task: bin_class
- - override /probe: attn
+ - override /probe: attn_single
 
