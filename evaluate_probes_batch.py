@@ -37,10 +37,10 @@ def main(cfg: DictConfig) -> None:
   except ConfigAttributeError:
     layerlabel = input('Insert a layer label: ')
   
-  testoutputdir = os.path.join(".","outputs",cfg.model.model_name,cfg.task.task_type,
+  testoutputdir = os.path.join(cfg.output_root,cfg.model.model_name,cfg.task.task_type,
                            cfg.dataset.DATASET_NAME+'_test')
   ## probes are those trained on the version with no 'test'
-  probeoutputdir = os.path.join(".","outputs",cfg.model.model_name,cfg.task.task_type,
+  probeoutputdir = os.path.join(cfg.output_root,cfg.model.model_name,cfg.task.task_type,
                                 cfg.dataset.DATASET_NAME,layerlabel+"_probes")
   testprobeoutputdir = os.path.join(testoutputdir,layerlabel+"_probes")
   

@@ -1,4 +1,4 @@
-outputs_path: outputs/${model.model_name}/${task.task_type}/${dataset.DATASET_NAME}
+outputs_path: ${output_root}/${model.model_name}/${task.task_type}/${dataset.DATASET_NAME}
 type: independent
 log_dir: 'logs/${model.model_name}'
 versionlabel: 'vv1_single'

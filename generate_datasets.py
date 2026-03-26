@@ -60,7 +60,8 @@ def main(cfg: DictConfig):
     print('Creating metadata')
     meta_generator = hydra.utils.instantiate(cfg.dataset.generate_metadata_function)
     metadata = meta_generator(cfg.dataset,constants)
-   pd.DataFrame(metadata).to_csv(datadir+"metadata.csv",index=False) #save metadata
+    
+    pd.DataFrame(metadata).to_csv(datadir+"metadata.csv",index=False) #save metadata
     with open(configpath,'w') as f: #save config used to generate it
       OmegaConf.save(cfg,f)#, default_flow_style=False)
 

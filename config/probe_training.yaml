@@ -8,6 +8,7 @@ defaults:
   - override hydra/job_logging: disabled
 
 select_colshapes: null
+output_root: ./outputs
 
 hydra:  
   output_subdir: null
