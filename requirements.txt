@@ -24,6 +24,7 @@ pillow==11.2.1
 tqdm==4.67.1
 matplotlib==3.10.3
 seaborn==0.13.2
+scipy==1.16.0
 
 # Notebook support (project includes multiple .ipynb files)
 jupyter
