@@ -4,3 +4,4 @@ outputs/*/cs_bal_1t/data_templates_81/*
 docs
 logs
 .vscode
+.venv

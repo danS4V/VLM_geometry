@@ -1,0 +1,31 @@
+# Core ML stack
+# Note: install a CUDA-compatible torch build for your GPU (or CPU build if needed).
+torch
+torchvision
+
+# Hugging Face / model loading
+transformers>=4.50.0
+accelerate
+sentencepiece
+timm
+einops
+
+# Training / experiment config
+hydra-core
+omegaconf
+pyrootutils
+python-dotenv
+lightning
+pytorch-lightning
+
+# Data and utilities
+numpy
+pandas
+pillow
+tqdm
+matplotlib
+seaborn
+
+# Notebook support (project includes multiple .ipynb files)
+jupyter
+ipykernel
