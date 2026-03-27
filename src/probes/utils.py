@@ -31,6 +31,25 @@ def GetLoss(LossName):
 ################
 ### DATASETS ###
 
+class HasColorShapeMultiLabelDataset(torch.utils.data.Dataset):
+  '''
+  Multi-label dataset for joint probe training.
+  Returns hidden states and a (K,) vector of binary labels, one per concept.
+  colshapes must be an ordered list of K concept strings (e.g. ['redsquare', ...]);
+  the same order must be preserved when loading the trained joint probe.
+  '''
+  def __init__(self, metadata, colshapes, hidden_states):
+    self.labels = torch.tensor(metadata[colshapes].values, dtype=torch.float32)  # (N, K)
+    self.data = hidden_states[metadata['ID'].astype(int).tolist()].cuda()
+    self.ids = metadata['ID'].tolist()
+
+  def __len__(self):
+    return len(self.labels)
+
+  def __getitem__(self, idx):
+    return self.data[idx], self.labels[idx]
+
+
 class HasColorShapeDataset(torch.utils.data.Dataset):
   '''
   In this dataset, the target labels are 0-1 values for a single colorshape

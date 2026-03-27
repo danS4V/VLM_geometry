@@ -18,9 +18,10 @@ warnings.filterwarnings('ignore')
 
 pyrootutils.setup_root('.', dotenv=True, pythonpath=False)
 sys.path.append('./src')
+import json
 import probes.utils
 from vlm_datasets.utils import GetSubset
-from probes.fitters import FitIndepProbeNoTest
+from probes.fitters import FitIndepProbeNoTest, FitJointProbeNoTest
 
 def GenerateAnswerMetadata(outputdir,cfg) -> pd.DataFrame:
   '''
@@ -131,7 +132,22 @@ def main(cfg: DictConfig) -> None:
         #so i overwrite it every time instead then just at the end
       torch.cuda.empty_cache()
     return
-  else: 
+
+  elif cfg.probe.type == 'joint':
+    colshapes = [c + s for c, s in product(cfg.dataset.COLORS, cfg.dataset.SHAPES)]
+    print(f"\033[92mJoint training on {len(colshapes)} concepts\033[0m")
+    probe = FitJointProbeNoTest(colshapes, metapd, outputs, probelabel, cfg)
+    weights_path = os.path.join(probeoutputdir, f'joint_{cfg.probe.versionlabel}.nn')
+    torch.save(probe.state_dict(), weights_path)
+    # Save the canonical concept order so evaluation can recover per-concept columns
+    index_path = os.path.join(probeoutputdir, f'joint_{cfg.probe.versionlabel}_colshapes.json')
+    with open(index_path, 'w') as f:
+      json.dump(colshapes, f)
+    print(f"Saved joint probe weights to {weights_path}")
+    print(f"Saved concept index to {index_path}")
+    return
+
+  else:
     raise NotImplementedError(f"Probe type {cfg.probe.type} not implemented")
 
 

@@ -17,6 +17,8 @@ import os
 import glob
 import pickle
 
+import json
+
 import pyrootutils, sys
 
 import warnings
@@ -57,26 +59,28 @@ def main(cfg: DictConfig) -> None:
     from train_probes import GenerateAnswerMetadata
     metapd = GenerateAnswerMetadata(testoutputdir, cfg)
 
+  dispatch = evaluate_joint if cfg.probe.type == 'joint' else evaluate
+
   ### TEST SET EVALUATION
   print('Processing test set')
-  evaluate(metapd, cfg,layerlabel,probeoutputdir,testprobeoutputdir,testoutputdir)
+  dispatch(metapd, cfg, layerlabel, probeoutputdir, testprobeoutputdir, testoutputdir)
 
   ### TRAINING SET EVALUATION
   print('Processing training set')
   testoutputdir = testoutputdir.replace('_test','')
   if os.path.exists(os.path.join(testoutputdir,'full_metadata.csv')):
     print('Loading existing metadata')
-    metapd = pd.read_csv(os.path.join(testoutputdir,'full_metadata.csv'), 
-                            dtype={'ID': 'string'}, 
-                            converters={'target_pos': literal_eval, 
+    metapd = pd.read_csv(os.path.join(testoutputdir,'full_metadata.csv'),
+                            dtype={'ID': 'string'},
+                            converters={'target_pos': literal_eval,
                                         'distractors': literal_eval}
                 )
   else:
     print('Generating metadata')
     from train_probes import GenerateAnswerMetadata
     metapd = GenerateAnswerMetadata(testoutputdir, cfg)
-  evaluate(metapd,cfg,layerlabel,probeoutputdir,
-           testprobeoutputdir.replace('_test',''),testoutputdir)
+  dispatch(metapd, cfg, layerlabel, probeoutputdir,
+           testprobeoutputdir.replace('_test',''), testoutputdir)
 
 
 
@@ -165,6 +169,70 @@ def evaluate(metapd,cfg,layerlabel,probeoutputdir,testprobeoutputdir,testoutputd
   metapd.to_csv(os.path.join(testprobeoutputdir,f'full_metadata_{versionlabel}.csv'),index=False)
   with open(os.path.join(testprobeoutputdir,f'attns_logits_{versionlabel}.pkl'),'wb') as f:
     pickle.dump(attns,f)
+
+
+def evaluate_joint(metapd, cfg, layerlabel, probeoutputdir, testprobeoutputdir, testoutputdir):
+  '''Joint-probe evaluation: runs the single joint .nn file once to produce
+  per-concept probe output columns, matching the CSV format of evaluate().
+
+  Parameters mirror evaluate() for drop-in interchangeability.
+  '''
+  versionlabel = cfg.probe.versionlabel
+
+  # Load concept index saved during training
+  index_path = os.path.join(probeoutputdir, f'joint_{versionlabel}_colshapes.json')
+  with open(index_path) as f:
+    colshapes = json.load(f)
+
+  ### Load activations
+  outputs = []
+  tensorpaths = sorted(glob.glob(os.path.join(testoutputdir, layerlabel + "*.*")))
+
+  if ".pt" in tensorpaths[0]:
+    for path in tensorpaths:
+      print(path)
+      outputs.append(torch.load(path, map_location='cpu'))
+    outputs = torch.cat(outputs, dim=0)
+  elif ".pkl" in tensorpaths[0]:
+    for path in tensorpaths:
+      print(path)
+      with open(path, 'rb') as f:
+        outputs += pickle.load(f)
+    if cfg.model.probe_train_indexes[layerlabel] is not None:
+      indexes = cfg.model.probe_train_indexes[layerlabel]
+      print('Cutting hidden layers...', indexes)
+      for i, hiddenout in enumerate(outputs):
+        outputs[i] = hiddenout[0, indexes[0]:indexes[1], :]
+    outputs = torch.stack(outputs).squeeze().to(torch.float32)
+
+  ### Instantiate and load joint probe
+  from probes.probes import LAttnProbeJoint
+  # Dummy loss/optimizer for inference — not used during eval
+  probe = hydra.utils.instantiate(cfg.probe.probe_model, outputs.shape[2], len(colshapes))
+  probe.load_state_dict(torch.load(
+    os.path.join(probeoutputdir, f'joint_{versionlabel}.nn')
+  ))
+  probe = probe.cuda()
+  probe.eval()
+
+  ### Run in batches, collect (N, K) sigmoid outputs
+  all_probs = []
+  with torch.no_grad():
+    for start in tqdm(range(0, len(metapd), 1000)):
+      batch = outputs[start:start + 1000].to('cuda', dtype=torch.float32)
+      logits = probe(batch)           # (B, K)
+      all_probs.append(torch.sigmoid(logits).cpu())
+  all_probs = torch.cat(all_probs, dim=0)  # (N, K)
+
+  ### Write per-concept columns (same names as independent path)
+  for k, colshape in enumerate(colshapes):
+    metapd[colshape + '_probe_out'] = all_probs[:, k].numpy()
+
+  ### Save
+  if not os.path.exists(testprobeoutputdir):
+    os.makedirs(testprobeoutputdir)
+  metapd.to_csv(os.path.join(testprobeoutputdir, f'full_metadata_{versionlabel}.csv'), index=False)
+  # No per-concept attention logit pkl for joint probes (all K attentions share one pass)
 
 
 if __name__ == '__main__':

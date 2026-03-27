@@ -1,9 +1,10 @@
 ### These functions create a balanced subset of the dataset
 ### and train the probes
+import functools
 import pandas as pd
 import torch
+import torch.nn.functional as F
 from torch.utils.data import DataLoader, random_split
-# import torch.nn.functional as F
 import pytorch_lightning as pl
 import hydra
 import numpy as np
@@ -82,3 +83,61 @@ def FitIndepProbeNoTest(color,shape,metapd,outputs,label,cfg):
     torch.cuda.empty_cache()
     return probe,singletraintest
 
+
+def FitJointProbeNoTest(colshapes, metapd, outputs, label, cfg):
+    '''Fits a single joint probe predicting all K color-shape concepts simultaneously.
+
+    Uses all images without per-concept balancing. Per-concept pos_weight
+    (neg_count / pos_count) compensates for class imbalance.
+
+    Parameters
+    ----------
+    colshapes : list[str]
+        Ordered list of K concept strings (e.g. ['redsquare', 'redcircle', ...]).
+        Order must be preserved and saved alongside the probe weights.
+    metapd : pd.DataFrame
+        Full metadata with one binary column per concept in colshapes.
+    outputs : torch.Tensor
+        Activations tensor of shape (N, T, D).
+    label : str
+        Layer label used for logging.
+    cfg : DictConfig
+        Hydra config (must have cfg.probe.* entries from attn_joint.yaml).
+
+    Returns
+    -------
+    probe : LAttnProbeJoint
+    '''
+    dataset = probes.utils.HasColorShapeMultiLabelDataset(metapd, colshapes, outputs)
+    print('Total images for joint training:', len(dataset))
+
+    # Per-concept pos_weight = neg_count / pos_count to handle imbalance
+    labels    = dataset.labels          # (N, K) on CPU
+    pos_count = labels.sum(dim=0).clamp(min=1)
+    neg_count = (len(labels) - labels.sum(dim=0)).clamp(min=1)
+    pos_weight = (neg_count / pos_count).cuda()
+
+    dl_drop = (len(dataset) % cfg.probe.batch_size) < 5
+    train_dataloader = DataLoader(
+        dataset, batch_size=cfg.probe.batch_size, shuffle=True,
+        generator=torch.Generator(device='cuda'), drop_last=dl_drop,
+    )
+
+    probe = hydra.utils.instantiate(cfg.probe.probe_model, outputs.shape[2], len(colshapes))
+    # Override loss to inject pos_weight (data-dependent, cannot live in YAML)
+    probe.Loss = functools.partial(
+        F.binary_cross_entropy_with_logits, pos_weight=pos_weight
+    )
+
+    callbacks = []
+    for cb in cfg.probe.trainer_callbacks:
+        callbacks.append(hydra.utils.instantiate(cb))
+    logger = pl.loggers.CSVLogger(
+        cfg.probe.log_dir, name=label + '_joint', version=cfg.probe.versionlabel
+    )
+    trainer = hydra.utils.instantiate(cfg.probe.probe_trainer, callbacks=callbacks, logger=logger)
+    trainer.fit(probe, train_dataloader)
+
+    del dataset.data
+    torch.cuda.empty_cache()
+    return probe

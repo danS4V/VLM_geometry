@@ -1,0 +1,43 @@
+outputs_path: ${output_root}/${model.model_name}/${task.task_type}/${dataset.DATASET_NAME}
+type: joint
+log_dir: 'logs/${model.model_name}'
+versionlabel: 'vv1_joint'
+
+# in_dim and n_concepts are passed at runtime by FitJointProbeNoTest;
+# pos_weight is also injected at runtime from the training data.
+probe_model:
+  _target_: probes.probes.LAttnProbeJoint
+  Loss:
+    _target_: probes.utils.GetLoss
+    LossName: F.binary_cross_entropy_with_logits
+  optimizer:
+    _target_: torch.optim.SGD
+    _partial_: True  # needs parameters
+    lr: 1e-3
+    weight_decay: 0.5
+  scheduler:
+    _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+    _partial_: True  # needs optimizer
+    mode: min
+    factor: 0.5
+    threshold: 1e-4
+    patience: 5
+
+probe_trainer:
+  _target_: lightning.pytorch.trainer.Trainer
+  log_every_n_steps: 1
+  max_epochs: 1000
+
+batch_size: 50
+
+trainer_callbacks:
+  - _target_: lightning.pytorch.callbacks.EarlyStopping
+    monitor: 'training_loss'
+    min_delta: 1e-4
+    patience: 20
+    verbose: False
+    mode: 'min'
+  - _target_: lightning.pytorch.callbacks.LearningRateMonitor
+    logging_interval: epoch
+    log_momentum: False
+    log_weight_decay: False
