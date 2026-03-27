@@ -139,15 +139,9 @@ def main(cfg: DictConfig) -> None:
     except ConfigAttributeError:
         layer = input('Insert a layer label: ')
 
-    # Probe directory: follows the convention used by 4_2_a_probe.ipynb
-    # i.e. outputs/<model_name>/<dataset_name>/<layer>_probes/
-    # (no task_type subdirectory, matching where train_probes.py writes by default)
-    probeoutputdir = os.path.join(
-        cfg.output_root,
-        cfg.model.model_name,
-        cfg.dataset.DATASET_NAME,
-        f'{layer}_probes',
-    )
+    # Probe directory: mirrors train_probes.py which uses cfg.probe.outputs_path
+    # i.e. outputs/<model_name>/<task_type>/<dataset_name>/<layer>_probes/
+    probeoutputdir = os.path.join(cfg.probe.outputs_path, f'{layer}_probes')
 
     cv_outdir       = os.path.join(cfg.output_root, cfg.model.model_name)
     template_outdir = os.path.join(cfg.output_root, 'temp_eval', cfg.model.model_name)
