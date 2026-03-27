@@ -44,9 +44,10 @@ def generate_model_output(meta: dict, toprompt: tuple,
   logits_out = (generation_output['logits'][0][0][outindexes].cpu())
   return str_out,probs_out,logits_out
 
-def _generate_proj_hook(layer_name : str, target_pos : list, 
+def _generate_proj_hook_adaptive(layer_name : str, target_pos : list, 
                         prototypes: list = None):
-  '''Generates an hook that performs steering from prototypes[0] into prototypes[1].
+  '''Generates a hook that performs adaptive steering: intervention magnitude scaled by 
+  each token's projection onto the source concept.
   '''
 
   def proj_hook(model,input,output):
@@ -59,21 +60,52 @@ def _generate_proj_hook(layer_name : str, target_pos : list,
     else:
       raise Exception(f"Hook in layer {layer_name}: output type unknown, {type(output)}")
 
-    # print(tochange.shape)
     initshape = tochange.shape
     inittype = tochange.dtype
     tochangecloned = tochange.squeeze().to(torch.float)
-    # print(initshape,tochangecloned.shape)
     if prototypes is None:
       raise Error
     del_prot = prototypes[0]
     ins_prot = prototypes[1]
-    if len(tochangecloned.shape) == 3: #internvl splits one big image in subpictures, sth like 3×256×4k
+    if len(tochangecloned.shape) == 3:
       tochangecloned=tochangecloned.flatten(end_dim=1)
     
     for targettoken in range(tochangecloned.shape[0]): 
       target_proj_module = (tochangecloned[targettoken,:]@del_prot)
       tochangecloned[targettoken,:] = tochangecloned[targettoken,:]-target_proj_module*del_prot+target_proj_module*ins_prot
+    
+    tochange.copy_(tochangecloned.reshape(initshape).to(inittype))
+    return output
+  return proj_hook
+
+def _generate_proj_hook_global(layer_name : str, target_pos : list, 
+                        prototypes: list = None):
+  '''Generates a hook that performs global scaling steering: intervention magnitude is 
+  the same across all tokens (already baked into prototypes via template.multiplier).
+  '''
+
+  def proj_hook(model,input,output):
+    if isinstance(output, tuple):
+      tochange = output[0]['last_hidden_state']
+    elif isinstance(output,torch.Tensor):
+      tochange = output
+    elif isinstance(output, ModelOutput):
+      tochange = output['last_hidden_state'] 
+    else:
+      raise Exception(f"Hook in layer {layer_name}: output type unknown, {type(output)}")
+
+    initshape = tochange.shape
+    inittype = tochange.dtype
+    tochangecloned = tochange.squeeze().to(torch.float)
+    if prototypes is None:
+      raise Error
+    del_prot = prototypes[0]
+    ins_prot = prototypes[1]
+    if len(tochangecloned.shape) == 3:
+      tochangecloned=tochangecloned.flatten(end_dim=1)
+    
+    for targettoken in range(tochangecloned.shape[0]): 
+      tochangecloned[targettoken,:] = tochangecloned[targettoken,:] - del_prot + ins_prot
     
     tochange.copy_(tochangecloned.reshape(initshape).to(inittype))
     return output
@@ -112,7 +144,13 @@ def main(cfg: DictConfig):
   templates = templates.cuda()
   
   if cfg.template.type == 'token_vector':
-    hook_generator = _generate_proj_hook
+    scaling_mode = getattr(cfg.template, 'scaling_mode', 'adaptive')  # default to adaptive for backward compat
+    if scaling_mode == 'adaptive':
+      hook_generator = _generate_proj_hook_adaptive
+    elif scaling_mode == 'global':
+      hook_generator = _generate_proj_hook_global
+    else:
+      raise ValueError(f"Unknown scaling_mode: {scaling_mode}. Use 'adaptive' or 'global'.")
   else:
     raise KeyError
 
