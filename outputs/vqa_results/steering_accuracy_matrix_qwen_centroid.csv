@@ -1,0 +1,7 @@
+original_shape,square,triangle,circle,pentagon,star,heart
+square,0.0,1.23,1.23,0.0,0.0,0.0
+triangle,2.7,0.0,5.41,2.7,2.7,2.7
+circle,0.0,5.0,0.0,0.0,0.0,0.0
+pentagon,,,,,,
+star,90.0,100.0,85.0,60.0,0.0,95.0
+heart,80.0,76.0,88.0,28.0,84.0,0.0

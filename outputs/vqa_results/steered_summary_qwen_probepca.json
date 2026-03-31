@@ -1,0 +1,21 @@
+{
+  "model_name": "qwen",
+  "template_label": "probepca",
+  "total_steered_samples": 915,
+  "steered_accuracy": 9.289617486338798,
+  "accuracy_by_original_shape": {
+    "circle": 0.04,
+    "heart": 0.32,
+    "square": 0.009876543209876543,
+    "star": 0.35,
+    "triangle": 0.010810810810810811
+  },
+  "accuracy_by_end_shape": {
+    "circle": 0.12269938650306748,
+    "heart": 0.05063291139240506,
+    "pentagon": 0.0,
+    "square": 0.20588235294117646,
+    "star": 0.09202453987730061,
+    "triangle": 0.14383561643835616
+  }
+}

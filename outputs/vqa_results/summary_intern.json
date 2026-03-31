@@ -1,0 +1,23 @@
+{
+  "total_samples": 297,
+  "accuracy": 0.0,
+  "num_unique_outputs": 16,
+  "unique_outputs": [
+    "arch",
+    "arrow",
+    "circle",
+    "circular",
+    "diamond",
+    "heart",
+    "hexagon",
+    "none",
+    "octagon",
+    "oval",
+    "rectangle",
+    "round",
+    "square",
+    "star",
+    "the medallion is circular.",
+    "triangle"
+  ]
+}

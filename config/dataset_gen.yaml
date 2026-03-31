@@ -1,0 +1,16 @@
+recreate_meta: False
+generate_images: True
+
+defaults:
+  - _self_
+  - dataset: conj1.yaml
+  - model: null
+  - task: null
+  - probe: null
+  - override hydra/hydra_logging: disabled  
+  - override hydra/job_logging: disabled
+
+hydra:  
+  output_subdir: null
+  run:
+    dir: .

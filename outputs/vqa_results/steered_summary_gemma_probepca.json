@@ -1,0 +1,22 @@
+{
+  "model_name": "gemma",
+  "template_label": "probepca",
+  "total_steered_samples": 555,
+  "steered_accuracy": 0.9009009009009009,
+  "accuracy_by_original_shape": {
+    "circle": 0.0,
+    "heart": 0.011111111111111112,
+    "pentagon": 0.0,
+    "square": 0.015384615384615385,
+    "star": 0.0125,
+    "triangle": 0.0
+  },
+  "accuracy_by_end_shape": {
+    "circle": 0.05263157894736842,
+    "heart": 0.0,
+    "pentagon": 0.0,
+    "square": 0.0,
+    "star": 0.0,
+    "triangle": 0.0
+  }
+}

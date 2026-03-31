@@ -1,0 +1,17 @@
+__pycache__
+data/*/img/*
+data/*/img_que/*
+data/*/img_ref/*
+outputs/*/bin_class/data_templates_81/*
+outputs/*/bin_class/**
+outputs/temp_eval/*/*
+**/*.pkl
+docs
+logs
+.vscode
+.venv
+vqa_dataset
+!outputs/*/bin_class/cs_bal_1t/
+!outputs/*/bin_class/cs_bal_1t/mmp_probes/
+!**/*.csv
+!**/*.nn

@@ -1,0 +1,16 @@
+defaults:
+  - _self_
+  - dataset: conj1
+  - model: Gemma4B
+  - task: bin_class
+  - probe: attn
+  - template: null
+  - override hydra/hydra_logging: disabled  
+  - override hydra/job_logging: disabled
+
+select_colshapes: null
+
+hydra:  
+  output_subdir: null
+  run:
+    dir: .

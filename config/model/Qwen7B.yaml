@@ -1,0 +1,15 @@
+_target_: models.qwen.QwenModel
+model_id: Qwen/Qwen2.5-VL-7B-Instruct
+model_name: Qwen2_5_7B
+model_nicename: "Qwen 2.5 7B"
+probe_layers:
+  mmp:
+  - model
+  - visual
+  last_mlp:
+  - model
+  - language_model
+attn_layers: {}
+probe_train_indexes: #range of model hidden state outputs on which to train probes (usually image)
+  mmp: null
+  last_mlp: [14,272]

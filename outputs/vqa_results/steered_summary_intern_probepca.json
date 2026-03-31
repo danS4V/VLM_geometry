@@ -1,0 +1,21 @@
+{
+  "model_name": "intern",
+  "template_label": "probepca",
+  "total_steered_samples": 885,
+  "steered_accuracy": 22.033898305084744,
+  "accuracy_by_original_shape": {
+    "circle": 0.034782608695652174,
+    "heart": 0.5416666666666666,
+    "square": 0.02608695652173913,
+    "star": 0.63,
+    "triangle": 0.2634146341463415
+  },
+  "accuracy_by_end_shape": {
+    "circle": 0.3181818181818182,
+    "heart": 0.24183006535947713,
+    "pentagon": 0.0,
+    "square": 0.3425925925925926,
+    "star": 0.21019108280254778,
+    "triangle": 0.2867647058823529
+  }
+}

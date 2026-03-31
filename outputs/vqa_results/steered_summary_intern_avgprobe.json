@@ -1,0 +1,21 @@
+{
+  "model_name": "intern",
+  "template_label": "avgprobe",
+  "total_steered_samples": 885,
+  "steered_accuracy": 0.22598870056497175,
+  "accuracy_by_original_shape": {
+    "circle": 0.0,
+    "heart": 0.0,
+    "square": 0.0,
+    "star": 0.01,
+    "triangle": 0.004878048780487805
+  },
+  "accuracy_by_end_shape": {
+    "circle": 0.0,
+    "heart": 0.0,
+    "pentagon": 0.0,
+    "square": 0.0,
+    "star": 0.006369426751592357,
+    "triangle": 0.007352941176470588
+  }
+}

@@ -1,0 +1,12 @@
+_target_: models.internvl3.InternVL3Model
+model_id: OpenGVLab/InternVL3_5-8B-hf
+model_name: InternVL3_5_8B
+model_nicename: "InternVL 3.5 8B"
+probe_layers:
+  mmp:
+  - multi_modal_projector
+  last_mlp:
+  - language_model
+probe_train_indexes:
+  mmp: null
+  last_mlp: null

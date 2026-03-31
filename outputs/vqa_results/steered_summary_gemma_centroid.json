@@ -1,0 +1,22 @@
+{
+  "model_name": "gemma",
+  "template_label": "centroid",
+  "total_steered_samples": 555,
+  "steered_accuracy": 25.765765765765764,
+  "accuracy_by_original_shape": {
+    "circle": 0.05,
+    "heart": 0.4111111111111111,
+    "pentagon": 0.4,
+    "square": 0.020512820512820513,
+    "star": 0.65,
+    "triangle": 0.41904761904761906
+  },
+  "accuracy_by_end_shape": {
+    "circle": 0.3894736842105263,
+    "heart": 0.3118279569892473,
+    "pentagon": 0.12727272727272726,
+    "square": 0.3472222222222222,
+    "star": 0.14736842105263157,
+    "triangle": 0.26666666666666666
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "model_name": "intern",
+  "template_label": "centroid",
+  "total_steered_samples": 885,
+  "steered_accuracy": 1.1299435028248588,
+  "accuracy_by_original_shape": {
+    "circle": 0.008695652173913044,
+    "heart": 0.03333333333333333,
+    "square": 0.002898550724637681,
+    "star": 0.04,
+    "triangle": 0.0
+  },
+  "accuracy_by_end_shape": {
+    "circle": 0.006493506493506494,
+    "heart": 0.013071895424836602,
+    "pentagon": 0.0,
+    "square": 0.009259259259259259,
+    "star": 0.012738853503184714,
+    "triangle": 0.029411764705882353
+  }
+}

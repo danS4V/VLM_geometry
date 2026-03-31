@@ -1,0 +1,15 @@
+_target_: models.gemma.GemmaModel
+model_id: google/gemma-3-12b-it
+model_name: Gemma3_12B
+model_nicename: "Gemma 3 12B"
+probe_layers:
+  mmp:
+  - model
+  - multi_modal_projector
+  # last_mlp:
+  # - model
+  # - language_model
+attn_layers: {}
+probe_train_indexes:
+  mmp: null
+  last_mlp: [11,269]

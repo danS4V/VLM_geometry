@@ -1,0 +1,6 @@
+task_type: bin_class
+prompt_format: "Look at the image carefully.\nIs there a {target_color} {target_shape} in the image?\nAnswer only 'yes' or 'no'."
+batch_size: 600 #batch_skip and batch_stop to compute only a selected batch.
+
+skip_index: null
+stop_index: null

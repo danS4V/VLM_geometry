@@ -1,0 +1,21 @@
+{
+  "model_name": "qwen",
+  "template_label": "centroid",
+  "total_steered_samples": 915,
+  "steered_accuracy": 19.672131147540984,
+  "accuracy_by_original_shape": {
+    "circle": 0.01,
+    "heart": 0.68,
+    "square": 0.0049382716049382715,
+    "star": 0.86,
+    "triangle": 0.032432432432432434
+  },
+  "accuracy_by_end_shape": {
+    "circle": 0.24539877300613497,
+    "heart": 0.12658227848101267,
+    "pentagon": 0.1092896174863388,
+    "square": 0.3627450980392157,
+    "star": 0.13496932515337423,
+    "triangle": 0.2808219178082192
+  }
+}

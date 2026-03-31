@@ -1,0 +1,21 @@
+{
+  "model_name": "intern",
+  "template_label": "probe",
+  "total_steered_samples": 885,
+  "steered_accuracy": 2.598870056497175,
+  "accuracy_by_original_shape": {
+    "circle": 0.008695652173913044,
+    "heart": 0.08333333333333333,
+    "square": 0.0,
+    "star": 0.05,
+    "triangle": 0.03414634146341464
+  },
+  "accuracy_by_end_shape": {
+    "circle": 0.01948051948051948,
+    "heart": 0.0196078431372549,
+    "pentagon": 0.0,
+    "square": 0.027777777777777776,
+    "star": 0.044585987261146494,
+    "triangle": 0.051470588235294115
+  }
+}
